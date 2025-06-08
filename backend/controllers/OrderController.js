@@ -130,35 +130,14 @@ export const getOrdersByUser = async (req, res) => {
       include: [{ model: Product }],
       order: [["tanggal_dibuat", "DESC"]],
     });
-
     console.log(
       "📦 Raw orders from database:",
       JSON.stringify(orders, null, 2)
     );
 
-    // Simplified: Only return actual database fields + product info
-    const formatted = orders.map((order) => {
-      const formattedOrder = {
-        // Database fields exactly as they are
-        id: order.id,
-        userid: order.userid, // Database field name
-        productid: order.productid, // Database field name
-        quantity: order.quantity,
-        totalprice: order.totalprice, // Database field name
-        status: order.status,
-        tanggal_dibuat: order.tanggal_dibuat,
-        tanggal_diperbarui: order.tanggal_diperbarui,
-
-        // Include product info for convenience
-        product: order.Product,
-      };
-
-      console.log("✅ Formatted order:", formattedOrder);
-      return formattedOrder;
-    });
-
-    console.log("📤 Sending formatted orders to frontend:", formatted);
-    res.json(formatted);
+    // Return raw Sequelize objects like the admin endpoint does
+    // This ensures consistency and avoids field mapping errors
+    res.json(orders);
   } catch (error) {
     console.error("❌ Error in getOrdersByUser:", error);
     res.status(500).json({ message: error.message });
