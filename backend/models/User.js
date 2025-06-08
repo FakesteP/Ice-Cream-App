@@ -29,6 +29,15 @@ const User = db.define(
       allowNull: false,
       validate: { isIn: [["admin", "customer"]] },
     },
+    profilePhoto: {
+      type: Sequelize.BLOB("long"),
+      allowNull: true,
+    },
+    profilePhotoType: {
+      type: Sequelize.STRING,
+      allowNull: true,
+      comment: "MIME type of the profile photo (e.g., image/jpeg, image/png)",
+    },
   },
   {
     freezeTableName: true,
