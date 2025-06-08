@@ -123,23 +123,44 @@ export const updateOrderStatus = async (req, res) => {
 export const getOrdersByUser = async (req, res) => {
   try {
     const userId = req.params.userId;
+    console.log("🔍 Getting orders for user:", userId);
+
     const orders = await Order.findAll({
       where: { userId },
       include: [{ model: Product }],
       order: [["tanggal_dibuat", "DESC"]],
     });
-    // Format agar frontend mudah akses nama produk, jumlah, tanggal
-    const formatted = orders.map((order) => ({
-      id: order.id,
-      productName: order.Product?.name,
-      quantity: order.quantity,
-      tanggal_dibuat: order.tanggal_dibuat,
-      status: order.status,
-      totalPrice: order.totalPrice,
-      product: order.Product,
-    }));
+
+    console.log(
+      "📦 Raw orders from database:",
+      JSON.stringify(orders, null, 2)
+    );
+
+    // Simplified: Only return actual database fields + product info
+    const formatted = orders.map((order) => {
+      const formattedOrder = {
+        // Database fields exactly as they are
+        id: order.id,
+        userid: order.userid, // Database field name
+        productid: order.productid, // Database field name
+        quantity: order.quantity,
+        totalprice: order.totalprice, // Database field name
+        status: order.status,
+        tanggal_dibuat: order.tanggal_dibuat,
+        tanggal_diperbarui: order.tanggal_diperbarui,
+
+        // Include product info for convenience
+        product: order.Product,
+      };
+
+      console.log("✅ Formatted order:", formattedOrder);
+      return formattedOrder;
+    });
+
+    console.log("📤 Sending formatted orders to frontend:", formatted);
     res.json(formatted);
   } catch (error) {
+    console.error("❌ Error in getOrdersByUser:", error);
     res.status(500).json({ message: error.message });
   }
 };
